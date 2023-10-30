@@ -10,24 +10,25 @@ class FliptClient {
     protected string $host;
     protected string $apiToken;
     protected string $namespace;
+    protected string $entityId;
     protected array $context;
 
 
-    public function __construct( string $host, string $apiToken, string $namespace, array $context = [] ) {
+    public function __construct( string $host, string $apiToken, string $namespace, array $context = [], string $entityId = '' ) {
         $this->apiToken = $apiToken;
         $this->host = $host;
         $this->namespace = $namespace;
         $this->context = $context;
-
+        $this->entityId = $entityId;
     }
 
 
     /**
      * Returns true/false based on the context evaluation
      */
-    public function boolean( string $name, $context = [] ) {
+    public function boolean( string $name, $context = [], $entityId = '' ) {
 
-        $response = $this->evaluationRequest( '/evaluate/v1/boolean', $name, $context );
+        $response = $this->evaluationRequest( '/evaluate/v1/boolean', $name, $context, $entityId );
 
         return $response['enabled'];
     }
@@ -37,9 +38,9 @@ class FliptClient {
     /**
      * Returns the variant key of the matching rule
      */
-    public function variant( string $name, $context = [] ) {
+    public function variant( string $name, $context = [], $entityId = '' ) {
 
-        $response = $this->evaluationRequest( '/evaluate/v1/variant', $name, $context );
+        $response = $this->evaluationRequest( '/evaluate/v1/variant', $name, $context, $entityId );
 
         if( $response['match'] ) return $response['variantKey'];
     }
@@ -48,9 +49,9 @@ class FliptClient {
     /**
      * Returns the variant attachment of the matching rule
      */
-    public function variantAttachment( string $name, $context = [] ) {
+    public function variantAttachment( string $name, $context = [], $entityId = '' ) {
 
-        $response = $this->evaluationRequest( '/evaluate/v1/variant', $name, $context );
+        $response = $this->evaluationRequest( '/evaluate/v1/variant', $name, $context, $entityId );
 
         if( $response['match'] ) return json_decode( $response['variantAttachment'] );
     }
@@ -62,11 +63,11 @@ class FliptClient {
     /**
      * Helper function to create an evaluation request based on the client settings
      */
-    protected function evaluationRequest( string $path, string $name, $context = [] ) {
+    protected function evaluationRequest( string $path, string $name, $context = [], $entityId = NULL ) {
 
         return $this->apiRequest( $path, [
             'context' => array_merge_recursive( $this->context, $context ),
-            'entityId' => '',
+            'entityId' => is_set( $entityId ) ? $entityId : $this->entityId,
             'flagKey' => $name,
             'namespaceKey' => $this->namespace,
         ] );
