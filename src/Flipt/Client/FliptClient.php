@@ -27,7 +27,7 @@ class FliptClient {
     /**
      * Returns true/false based on the context evaluation
      */
-    public function boolean( string $name, $context = [], $entityId = '' ) {
+    public function boolean( string $name, $context = [], $entityId = NULL ):bool {
 
         $response = $this->evaluationRequest( '/evaluate/v1/boolean', $name, $context, $entityId );
 
@@ -39,7 +39,7 @@ class FliptClient {
     /**
      * Returns the variant key of the matching rule
      */
-    public function variant( string $name, $context = [], $entityId = '' ) {
+    public function variant( string $name, $context = [], $entityId = NULL ):string {
 
         $response = $this->evaluationRequest( '/evaluate/v1/variant', $name, $context, $entityId );
 
@@ -50,11 +50,11 @@ class FliptClient {
     /**
      * Returns the variant attachment of the matching rule
      */
-    public function variantAttachment( string $name, $context = [], $entityId = '' ) {
+    public function variantAttachment( string $name, $context = [], $entityId = NULL ):array {
 
         $response = $this->evaluationRequest( '/evaluate/v1/variant', $name, $context, $entityId );
 
-        if( $response['match'] ) return json_decode( $response['variantAttachment'] );
+        if( $response['match'] ) return json_decode( $response['variantAttachment'], true );
     }
 
 
@@ -67,7 +67,7 @@ class FliptClient {
     protected function evaluationRequest( string $path, string $name, $context = [], $entityId = NULL ) {
 
         return $this->apiRequest( $path, [
-            'context' => array_merge_recursive( $this->context, $context ),
+            'context' => array_merge( $this->context, $context ),
             'entityId' => isset( $entityId ) ? $entityId : $this->entityId,
             'flagKey' => $name,
             'namespaceKey' => $this->namespace,
@@ -97,13 +97,13 @@ class FliptClient {
      * Create a new client with a different namespace
      */
     public function withNamespace( string $namespace ) {
-        return new FliptClient( $this->host, $this->apiToken, $namespace, $this->context );
+        return new FliptClient( $this->client, $this->apiToken, $namespace, $this->context, $this->entityId );
     }
 
     /**
      * Create a new client with a different context
      */
     public function withContext( array $context ) {
-        return new FliptClient( $this->host, $this->apiToken, $this->namespace, $context );
+        return new FliptClient( $this->client, $this->apiToken, $this->namespace, $context, $this->entityId );
     }
 }

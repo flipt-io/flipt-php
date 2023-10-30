@@ -28,7 +28,46 @@ final class FliptClientTest extends TestCase
             'handler' => $handlerStack,
         ]);
 
-        $this->apiClient = new FliptClient( $httpClient, 'token', 'namespace', [ 'context' => 'demo' ] );
+        $this->apiClient = new FliptClient( $httpClient, 'token', 'namespace', [ 'context' => 'demo' ], 'entityId' );
+    }
+
+
+
+    public function testContextMerge(): void {
+
+        $this->queueResponse( [ 'enabled' => true ] );
+
+        $client2 = $this->apiClient->withContext( [ 'context1' => 'one', 'context2' => 'two' ] );
+
+        $client2->boolean('flag', [ 'user' => 'demo2', 'context1' => 'new' ] );
+        $payload = $this->getLastPayload();
+
+        $this->assertEquals( $payload, [
+            'flagKey' => 'flag',
+            'namespaceKey' => 'namespace',
+            'context' => [ 'user' => 'demo2', 'context1' => 'new', 'context2' => 'two' ],
+            'entityId' => 'entityId',
+        ]);
+
+    }
+
+
+    public function testEntityId(): void {
+
+        // test boolean entity request
+        $this->queueResponse( [ 'enabled' => true ] );
+
+        $result = $this->apiClient->boolean('flag', [], 'ENTITY' );
+
+        $payload = $this->getLastPayload();
+        $this->assertEquals( $payload, [
+            'flagKey' => 'flag',
+            'namespaceKey' => 'namespace',
+            'context' => [ 'context' => 'demo' ],
+            'entityId' => 'ENTITY',
+        ]);
+
+        
     }
 
     
@@ -44,12 +83,81 @@ final class FliptClientTest extends TestCase
         // get payload on request to validate
         $payload = $this->getLastPayload();
 
+        $this->assertEquals( $payload, [
+            'flagKey' => 'flag',
+            'namespaceKey' => 'namespace',
+            'context' => [ 'context' => 'demo' ],
+            'entityId' => 'entityId',
+        ]);
+
         $this->assertTrue( $result );
+
+
+        // test false 
+        $this->queueResponse( [ 'enabled' => false ] );
+        $result = $this->apiClient->boolean('flag');
+        $this->assertFalse( $result );
     }
 
 
+    public function testVariant(): void
+    {
+        
+        $this->queueResponse( [ 'match' => true, 'variantKey' => 'A' ] );
+
+        // execute the client function
+        $result = $this->apiClient->variant('flag');
+
+        // get payload on request to validate
+        $payload = $this->getLastPayload();
+
+        $this->assertEquals( $payload, [
+            'flagKey' => 'flag',
+            'namespaceKey' => 'namespace',
+            'context' => [ 'context' => 'demo' ],
+            'entityId' => 'entityId',
+        ]);
+
+        $this->assertEquals( $result, 'A' );
+        
+        
+        $this->queueResponse( [ 'match' => true, 'variantKey' => 'B' ] );
+        $result = $this->apiClient->variant('flag');
+        $this->assertEquals( $result, 'B' );
+
+    }
+
+
+    public function testVariantAttachment(): void
+    {
+        
+        $this->queueResponse( [ 'match' => true, 'variantAttachment' => '{"demo":"json"}' ] );
+
+        // execute the client function
+        $result = $this->apiClient->variantAttachment('flag');
+
+        // get payload on request to validate
+        $payload = $this->getLastPayload();
+
+        $this->assertEquals( $payload, [
+            'flagKey' => 'flag',
+            'namespaceKey' => 'namespace',
+            'context' => [ 'context' => 'demo' ],
+            'entityId' => 'entityId',
+        ]);
+
+        $this->assertEquals( $result, [ 'demo' => 'json' ] );
+        
+        
+        $this->queueResponse( [ 'match' => true, 'variantAttachment' => '{"demo2":"json2"}' ] );
+        $result = $this->apiClient->variantAttachment('flag');
+        $this->assertEquals( $result, [ 'demo2' => 'json2' ] );
+    }
+
+
+
     protected function getLastPayload() {
-        return json_decode( $this->history[0]['request']->getBody()->getContents() );
+        return json_decode( $this->history[0]['request']->getBody()->getContents(), true );
     }
 
     protected function queueResponse( array $response ) {
