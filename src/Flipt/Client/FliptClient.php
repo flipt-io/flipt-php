@@ -67,7 +67,7 @@ class FliptClient {
 
         return $this->apiRequest( $path, [
             'context' => array_merge_recursive( $this->context, $context ),
-            'entityId' => is_set( $entityId ) ? $entityId : $this->entityId,
+            'entityId' => isset( $entityId ) ? $entityId : $this->entityId,
             'flagKey' => $name,
             'namespaceKey' => $this->namespace,
         ] );
