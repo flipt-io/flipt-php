@@ -1,6 +1,6 @@
 {
-    "name": "flipt/server-sdk",
-    "description": "Flipt SDK for PHP",
+    "name": "flipt/client",
+    "description": "A Flipt client to evaluate flags on a remote flipt instance",
     "keywords": [
         "flipt",
         "flipt php",
