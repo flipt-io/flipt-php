@@ -13,7 +13,9 @@ Install the client with composer:
 composer install flipt/client
 ```
 
-Instantiate a client with the corresponding settings:
+
+Instantiate a client with the corresponding settings.
+The api token can be generated under Settings -> API Tokens.
 
 ```php
 $flipt = new \Flipt\Client( 'https://my-flipt.io', '<apiToken>', '<default namespace>', [ 'default' => 'context' ] );
