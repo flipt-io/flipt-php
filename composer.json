@@ -1,0 +1,33 @@
+{
+    "name": "flipt/server-sdk",
+    "description": "Flipt SDK for PHP",
+    "keywords": [
+        "flipt",
+        "flipt php",
+        "feature flags"
+    ],
+    "homepage": "https://github.com/legoheld/flipt-php",
+    "require": {
+        "php": ">=8.0",
+        "guzzlehttp/guzzle": "^7"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.15.0",
+        "kevinrob/guzzle-cache-middleware": "^4.0",
+        "phpunit/php-code-coverage": "^9",
+        "phpunit/phpunit": "^9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Flipt\\": "src/Flipt/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Flipt\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
