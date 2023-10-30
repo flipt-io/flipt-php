@@ -74,3 +74,15 @@ $fliptB = $fliptA->withNamespace( 'B' ),
 // this will test on namespace B
 $fliptB->boolean('flag')
 ```
+
+
+## Tests
+
+Tests can be run in a docker container like this:
+
+```bash
+docker run -v $PWD:/app -w /app composer install
+
+// TODO: find image with phpunit and xdebug already installed
+docker run -v $PWD:/app -w /app -e XDEBUG_CONFIG="client_host=host.docker.internal discover_client_host=true"  --entrypoint vendor/bin/phpunit registry.gitlab.lernetz.ch/docker/laravel:9-php8-fpm-node18-dev
+```

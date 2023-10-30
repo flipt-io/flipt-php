@@ -7,19 +7,20 @@ use GuzzleHttp\Client;
 
 class FliptClient {
 
-    protected string $host;
+    protected Client $client;
     protected string $apiToken;
     protected string $namespace;
     protected string $entityId;
     protected array $context;
 
 
-    public function __construct( string $host, string $apiToken, string $namespace, array $context = [], string $entityId = '' ) {
+    public function __construct( string|Client $host, string $apiToken, string $namespace, array $context = [], string $entityId = '' ) {
         $this->apiToken = $apiToken;
-        $this->host = $host;
         $this->namespace = $namespace;
         $this->context = $context;
         $this->entityId = $entityId;
+
+        $this->client = ( is_string( $host ) ) ? new Client([ 'base_uri' => $host ] ) : $host;
     }
 
 
@@ -79,11 +80,8 @@ class FliptClient {
      * Helper function to perform a guzzle request with the correct headers and body
      */
     protected function apiRequest( string $path, array $body = [], string $method = 'POST' ) {
-        $client = new Client( [
-            'base_uri' => $this->host,
-        ]);
 
-        $response = $client->request( $method, $path, [
+        $response = $this->client->request( $method, $path, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->apiToken,
                 'Accept' => 'application/json'
