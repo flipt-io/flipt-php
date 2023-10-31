@@ -1,12 +1,14 @@
 # Flipt PHP Library
 
+[![Packagist Version](https://img.shields.io/packagist/v/flipt-io/flipt)](https://packagist.org/packages/flipt-io/flipt)
+
 This client is a wrapper around the [Flipt.io](https://www.flipt.io) REST API to easily evaluate flags with a given context on a remote Flipt instance.
 
 Unlike some of our other SDKs, this client currently does not support the ability to create or update Flipt data. This client is intended to be used in applications that only needs to evaluate flags.
 
 ## Requirements
 
-- PHP 7.4 or higher
+- PHP 8.0 or higher
 - [Composer](https://getcomposer.org/)
 
 ## Documentation
