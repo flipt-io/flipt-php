@@ -1,10 +1,15 @@
 # Flipt PHP Library
 
 [![Packagist Version](https://img.shields.io/packagist/v/flipt-io/flipt)](https://packagist.org/packages/flipt-io/flipt)
+![beta](https://img.shields.io/badge/status-beta-yellow)
 
 This client is a wrapper around the [Flipt.io](https://www.flipt.io) REST API to easily evaluate flags with a given context on a remote Flipt instance.
 
 Unlike some of our other SDKs, this client currently does not support the ability to create or update Flipt data. This client is intended to be used in applications that only needs to evaluate flags.
+
+## Status
+
+This SDK status is `beta`, and there may be breaking changes between versions without a major version update. Therefore, we recommend pinning your installation of this package wherever necessary.
 
 ## Requirements
 
