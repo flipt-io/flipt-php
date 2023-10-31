@@ -1,11 +1,13 @@
 {
-  "name": "flipt/client",
-  "description": "A Flipt client to evaluate flags on a remote flipt instance",
+  "name": "flipt-io/flipt",
+  "description": "Official PHP SDK for the Flipt API",
   "keywords": [
     "flipt",
     "flipt php",
-    "feature flags"
+    "feature flags",
+    "feature toggles"
   ],
+  "license": "MIT",
   "homepage": "https://flipt.io",
   "require": {
     "php": ">=8.0",
