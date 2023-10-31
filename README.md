@@ -1,84 +1,105 @@
-# Flipt php client
+# Flipt PHP Library
 
+This client is a wrapper around the [Flipt.io](https://www.flipt.io) REST API to easily evaluate flags with a given context on a remote Flipt instance.
 
-This client is a wrapper around the [flipt.io](https://www.flipt.io) REST API to easily evaluate flags with a given context on a a remote flipt instance.
+Unlike some of our other SDKs, this client currently does not support the ability to create or update Flipt data. This client is intended to be used in applications that only needs to evaluate flags.
 
+## Requirements
 
-## Getting started
+- PHP 7.4 or higher
+- [Composer](https://getcomposer.org/)
 
+## Documentation
 
-Install the client with composer:
+API documentation is available at <https://www.flipt.io/docs/reference/overview>.
+
+## Install
+
+### Composer
 
 ```Bash
-composer install flipt/client
+composer install flipt-io/flipt
 ```
 
+## Usage
 
 Instantiate a client with the corresponding settings.
-The api token can be generated under Settings -> API Tokens.
+
+The API token can be generated under `Settings -> API Tokens` within your Flipt instance. See the [documentation](https://www.flipt.io/docs/authentication/overview) for more information.
 
 ```php
-$flipt = new \Flipt\Client( 'https://my-flipt.io', '<apiToken>', '<default namespace>', [ 'default' => 'context' ] );
+$flipt = new \Flipt\Client('https://my-flipt.io', '<apiToken>', '<default namespace>', [ 'default' => 'context' ]);
 
-// test on a boolean flag:
-if( $flipt->boolean( 'my-boolean' ) ) {
+// test on a boolean flag
+$resp = $flipt->boolean('my-boolean');
+
+if ($resp->getEnabled()) {
     // do somthing 
 }
 
-
-// get a variant key
-if( $flipt->variant( 'my-variant' ) == 'demo' ) {
+// test on variant flag
+$resp = $flipt->variant('my-variant');
+if ($resp->getVariantKey() == 'demo') {
     // do something
 }
-
 
 // get a variant attachment
-$array = $flipt->variantAttchment( 'my-variant' );
+$array = $resp->getVariantAttachment();
+
 // the returned value is an array and you can access properties like:
-if( $array['key'] == 'demo' ) {
+if ($array['key'] == 'demo') {
     // do something
 }
 ```
 
-
-
-### Adjust the context
+### Context
 
 You can setup the context in the constructor as shown in the example above.
-But you can always overwrite context values when accessing a flag as the following example shows:
-```php
-$flipt = new \Flipt\Client( 'https://my-flipt.io', 'token', 'namespace', [ 'environment' => 'test', 'user' => '23' ] );
 
+You can also overwrite context values when accessing a flag as the following example shows:
+
+```php
+$flipt = new \Flipt\Client('https://my-flipt.io', 'token', 'namespace', [ 'environment' => 'test', 'user' => '23' ]);
 
 // will send the context [ 'environment' => 'test', 'user' => '23' ] as defined in the client
-$test = $flipt->boolean( 'flag' ); 
+$test = $flipt->boolean('flag'); 
 
 // will send the context [ 'environment' => 'test', 'user' => '50' ] as it will merge the client context with the current from the call
-$test2 = $flipt->boolean( 'flag', [ 'user' => '50' ] );
-
+$test2 = $flipt->boolean('flag', [ 'user' => '50' ]);
 ```
 
+### Namespaces
 
-### Query another namespace
+See our [documentation](https://www.flipt.io/docs/concepts#namespaces) for more information about namespaces.
 
-If you need the query another namespace you can switch the namespace as follows:
+If you need to query another namespace you can switch the namespace as follows:
 
 ```php
-// this client will query against the A namespace
-$fliptA = new \Flipt\Client( 'https://my-flipt.io', 'token', 'A' );
+// this client will query against the 'test' namespace
+$fliptTest = new \Flipt\Client('https://my-flipt.io', 'token', 'test');
 
+// this will create a new client with all the settings from $fliptTest client except the namespace will changed to 'production'
+$fliptProd = $fliptTest->withNamespace('production'),
 
-// this will create a new client with all the settings from $fliptA client except the namespace that will change to B
-$fliptB = $fliptA->withNamespace( 'B' ),
-
-// this will test on namespace B
-$fliptB->boolean('flag')
+// this will use namespace 'production'
+$fliptProd->boolean('flag')
 ```
 
+## Testing
 
-## Tests
+### Local
 
-Tests can be run in a docker container like this:
+```bash
+# install composer dependencies
+composer install
+
+# execute phpunit
+composer run-script test
+```
+
+### Docker
+
+Tests can be run in a Docker container like this:
 
 ```bash
 # install composer dependencies
@@ -88,3 +109,6 @@ docker run -v $PWD:/app -w /app composer install
 docker run -v $PWD:/app -w /app --entrypoint vendor/bin/phpunit php:8-cli
 ```
 
+## Thanks :tada:
+
+Thanks to [legoheld](https://github.com/legoheld) for the initial implementation of this client.
