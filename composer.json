@@ -7,6 +7,12 @@
     "feature flags",
     "feature toggles"
   ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/flipt-io/flipt-php"
+    }
+  ],
   "license": "MIT",
   "homepage": "https://flipt.io",
   "require": {
