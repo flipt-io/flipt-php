@@ -1,31 +1,31 @@
 {
-    "name": "flipt/client",
-    "description": "A Flipt client to evaluate flags on a remote flipt instance",
-    "keywords": [
-        "flipt",
-        "flipt php",
-        "feature flags"
-    ],
-    "homepage": "https://github.com/legoheld/flipt-php",
-    "require": {
-        "php": ">=8.0",
-        "guzzlehttp/guzzle": "^7"
-    },
-    "require-dev": {
-        "phpunit/php-code-coverage": "^10",
-        "phpunit/phpunit": "^10"
-    },
-    "autoload": {
-        "psr-4": {
-            "Flipt\\": "src/Flipt/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Flipt\\Tests\\": "tests/"
-        }
-    },
-    "config": {
-        "sort-packages": true
+  "name": "flipt/client",
+  "description": "A Flipt client to evaluate flags on a remote flipt instance",
+  "keywords": [
+    "flipt",
+    "flipt php",
+    "feature flags"
+  ],
+  "homepage": "https://flipt.io",
+  "require": {
+    "php": ">=8.0",
+    "guzzlehttp/guzzle": "^7"
+  },
+  "require-dev": {
+    "phpunit/php-code-coverage": "^10",
+    "phpunit/phpunit": "^10"
+  },
+  "autoload": {
+    "psr-4": {
+      "Flipt\\": "src/Flipt/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Flipt\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  }
 }

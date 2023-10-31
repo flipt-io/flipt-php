@@ -3,9 +3,13 @@
 namespace Flipt\Client;
 
 use GuzzleHttp\Client;
+use Flipt\Models\BooleanEvaluationResult;
+use Flipt\Models\VariantEvaluationResult;
+use Flipt\Models\DefaultBooleanEvaluationResult;
+use Flipt\Models\DefaultVariantEvaluationResult;
 
-
-class FliptClient {
+final class FliptClient
+{
 
     protected Client $client;
     protected string $apiToken;
@@ -14,64 +18,53 @@ class FliptClient {
     protected array $context;
 
 
-    public function __construct( string|Client $host, string $apiToken, string $namespace, array $context = [], string $entityId = '' ) {
+    public function __construct(string|Client $host, string $apiToken, string $namespace, array $context = [], string $entityId = '')
+    {
         $this->apiToken = $apiToken;
         $this->namespace = $namespace;
         $this->context = $context;
         $this->entityId = $entityId;
 
-        $this->client = ( is_string( $host ) ) ? new Client([ 'base_uri' => $host ] ) : $host;
+        $this->client = (is_string($host)) ? new Client(['base_uri' => $host]) : $host;
     }
 
 
     /**
-     * Returns true/false based on the context evaluation
+     * Returns the boolean evaluation result
      */
-    public function boolean( string $name, $context = [], $entityId = NULL ):bool {
+    public function boolean(string $name, $context = [], $entityId = NULL): BooleanEvaluationResult
+    {
 
-        $response = $this->evaluationRequest( '/evaluate/v1/boolean', $name, $context, $entityId );
-
-        return $response['enabled'];
+        $response = $this->evaluationRequest('/evaluate/v1/boolean', $name, $context, $entityId);
+        return new DefaultBooleanEvaluationResult($response['enabled'], $response['reason'], $response['requestDurationMillis'], $response['requestId'], $response['timestamp']);
     }
 
 
 
     /**
-     * Returns the variant key of the matching rule
+     * Returns the variant evaluation result
      */
-    public function variant( string $name, $context = [], $entityId = NULL ):string {
+    public function variant(string $name, $context = [], $entityId = NULL): VariantEvaluationResult
+    {
 
-        $response = $this->evaluationRequest( '/evaluate/v1/variant', $name, $context, $entityId );
-
-        if( $response['match'] ) return $response['variantKey'];
+        $response = $this->evaluationRequest('/evaluate/v1/variant', $name, $context, $entityId);
+        return new DefaultVariantEvaluationResult($response['match'], $response['reason'], $response['requestDurationMillis'], $response['requestId'], $response['timestamp'], $response['segmentKeys'], $response['variantKey'], $response['variantAttachment']);
     }
-
-
-    /**
-     * Returns the variant attachment of the matching rule
-     */
-    public function variantAttachment( string $name, $context = [], $entityId = NULL ):array {
-
-        $response = $this->evaluationRequest( '/evaluate/v1/variant', $name, $context, $entityId );
-
-        if( $response['match'] ) return json_decode( $response['variantAttachment'], true );
-    }
-
-
 
 
 
     /**
      * Helper function to create an evaluation request based on the client settings
      */
-    protected function evaluationRequest( string $path, string $name, $context = [], $entityId = NULL ) {
+    protected function evaluationRequest(string $path, string $name, $context = [], $entityId = NULL)
+    {
 
-        return $this->apiRequest( $path, [
-            'context' => array_merge( $this->context, $context ),
-            'entityId' => isset( $entityId ) ? $entityId : $this->entityId,
+        return $this->apiRequest($path, [
+            'context' => array_merge($this->context, $context),
+            'entityId' => isset($entityId) ? $entityId : $this->entityId,
             'flagKey' => $name,
             'namespaceKey' => $this->namespace,
-        ] );
+        ]);
     }
 
 
@@ -79,14 +72,15 @@ class FliptClient {
     /**
      * Helper function to perform a guzzle request with the correct headers and body
      */
-    protected function apiRequest( string $path, array $body = [], string $method = 'POST' ) {
+    protected function apiRequest(string $path, array $body = [], string $method = 'POST')
+    {
 
-        $response = $this->client->request( $method, $path, [
+        $response = $this->client->request($method, $path, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->apiToken,
                 'Accept' => 'application/json'
             ],
-            'body' => json_encode( $body, JSON_FORCE_OBJECT ),
+            'body' => json_encode($body, JSON_FORCE_OBJECT),
         ]);
 
         return json_decode($response->getBody(), true);
@@ -96,14 +90,16 @@ class FliptClient {
     /**
      * Create a new client with a different namespace
      */
-    public function withNamespace( string $namespace ) {
-        return new FliptClient( $this->client, $this->apiToken, $namespace, $this->context, $this->entityId );
+    public function withNamespace(string $namespace)
+    {
+        return new FliptClient($this->client, $this->apiToken, $namespace, $this->context, $this->entityId);
     }
 
     /**
      * Create a new client with a different context
      */
-    public function withContext( array $context ) {
-        return new FliptClient( $this->client, $this->apiToken, $this->namespace, $context, $this->entityId );
+    public function withContext(array $context)
+    {
+        return new FliptClient($this->client, $this->apiToken, $this->namespace, $context, $this->entityId);
     }
 }
