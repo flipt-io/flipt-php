@@ -17,7 +17,8 @@
   "homepage": "https://flipt.io",
   "require": {
     "php": ">=8.0",
-    "guzzlehttp/guzzle": "^7"
+    "guzzlehttp/guzzle": "^7",
+    "psr/simple-cache": "^3"
   },
   "require-dev": {
     "phpunit/php-code-coverage": "^10",
