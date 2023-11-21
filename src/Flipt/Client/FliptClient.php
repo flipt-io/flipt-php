@@ -7,13 +7,10 @@ use Flipt\Models\BooleanEvaluationResult;
 use Flipt\Models\VariantEvaluationResult;
 use Flipt\Models\DefaultBooleanEvaluationResult;
 use Flipt\Models\DefaultVariantEvaluationResult;
-use Psr\SimpleCache\CacheInterface;
 
 
 final class FliptClient
 {
-
-    protected CacheInterface|null $cache;
     protected Client $client;
     protected string $apiToken;
     protected string $namespace;
@@ -21,13 +18,12 @@ final class FliptClient
     protected array $context;
 
 
-    public function __construct(string|Client $host, string $apiToken, string $namespace, array $context = [], string $entityId = '', CacheInterface $cache = NULL )
+    public function __construct(string|Client $host, string $apiToken, string $namespace, array $context = [], string $entityId = '')
     {
         $this->apiToken = $apiToken;
         $this->namespace = $namespace;
         $this->context = $context;
         $this->entityId = $entityId;
-        $this->cache = $cache;
 
         $this->client = (is_string($host)) ? new Client(['base_uri' => $host]) : $host;
     }
@@ -68,25 +64,23 @@ final class FliptClient
 
 
         // map all responses to corresponding results
-        return array_map( function( $resp ) {
+        return array_map(function ($resp) {
 
-            if( $resp['type'] == 'VARIANT_EVALUATION_RESPONSE_TYPE' ) {
+            if ($resp['type'] == 'VARIANT_EVALUATION_RESPONSE_TYPE') {
                 // get the variant response
                 $vr = $resp['variantResponse'];
                 return new DefaultVariantEvaluationResult($vr['match'], $vr['reason'], $vr['requestDurationMillis'], $vr['requestId'], $vr['timestamp'], $vr['segmentKeys'], $vr['variantKey'], $vr['variantAttachment']);
             }
 
-            if( $resp['type'] == 'BOOLEAN_EVALUATION_RESPONSE_TYPE' ) {
+            if ($resp['type'] == 'BOOLEAN_EVALUATION_RESPONSE_TYPE') {
                 // get the boolean response
                 $vr = $resp['booleanResponse'];
                 return new DefaultBooleanEvaluationResult($vr['enabled'], $vr['reason'], $vr['requestDurationMillis'], $vr['requestId'], $vr['timestamp']);
             }
 
             return null;
-
-        }, $response['responses'] );
+        }, $response['responses']);
     }
-
 
 
     protected function mergeRequestParams(string $name, $context = [], $entityId = NULL)
@@ -107,11 +101,6 @@ final class FliptClient
     protected function apiRequest(string $path, array $body = [], string $method = 'POST')
     {
 
-        // check cache for given value
-        $cacheKey = $this->cacheKey( $path, $body );
-        $cached = $this->cacheGet( $cacheKey );
-        if( isset( $cached ) ) return $cached;
-
         // execute request
         $response = $this->client->request($method, $path, [
             'headers' => [
@@ -121,12 +110,7 @@ final class FliptClient
             'body' => json_encode($body, JSON_FORCE_OBJECT),
         ]);
 
-
-        // write result into cache
-        $parsed = json_decode($response->getBody(), true);
-        $this->cacheSet( $this->cacheKey( $path, $body ), $parsed );
-
-        return $parsed;
+        return json_decode($response->getBody(), true);
     }
 
 
@@ -134,35 +118,11 @@ final class FliptClient
     /**
      * generates a unique cache key based on the given path and request body
      */
-    protected function cacheKey(string $path, array $body) {
-        return md5( json_encode( $body ) . $path );
+    protected function cacheKey(string $path, array $body)
+    {
+        return md5(json_encode($body) . $path);
     }
 
-    /**
-     * Helper function to retrieve something from cache
-     */
-    protected function cacheGet( $key ) {
-
-        if( empty( $this->cache ) ) return null;
-
-        $entries = $this->cache->get('flipt-php', []);
-
-        if( array_key_exists( $key, $entries ) ) return $entries[ $key ];
-
-        return null;
-    }
-
-    /**
-     * Helper function to set a cache value
-     */
-    protected function cacheSet( $key, $value ) {
-        if( empty( $this->cache ) ) return;
-
-        $entries = $this->cache->get('flipt-php', []);
-        $entries[ $key ] = $value;
-
-        $this->cache->set( 'flipt-php', $entries );
-    }
 
 
     /**
@@ -179,13 +139,5 @@ final class FliptClient
     public function withContext(array $context)
     {
         return new FliptClient($this->client, $this->apiToken, $this->namespace, $context, $this->entityId);
-    }
-
-
-    /**
-     * Invalidate cache of client
-     */
-    public function cacheClear() {
-        if( isset( $this->cache ) ) $this->cache->delete( 'flipt-php' );
     }
 }
