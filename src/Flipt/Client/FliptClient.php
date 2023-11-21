@@ -114,17 +114,6 @@ final class FliptClient
     }
 
 
-
-    /**
-     * generates a unique cache key based on the given path and request body
-     */
-    protected function cacheKey(string $path, array $body)
-    {
-        return md5(json_encode($body) . $path);
-    }
-
-
-
     /**
      * Create a new client with a different namespace
      */
