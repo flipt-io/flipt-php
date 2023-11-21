@@ -123,6 +123,77 @@ final class FliptClientTest extends TestCase
         $this->assertEquals($result->getVariantAttachment(), "{'data':'attachment'}");
     }
 
+
+    public function testBatch(): void
+    {
+
+        $this->queueResponse([
+            'responses' => [
+                [
+                    "type" => "BOOLEAN_EVALUATION_RESPONSE_TYPE",
+                    'booleanResponse' => [
+                        'enabled' => true, 'reason' => 'MATCH_EVALUATION_REASON', 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z'
+                    ]
+                ],
+                [
+                    "type" => "VARIANT_EVALUATION_RESPONSE_TYPE",
+                    'variantResponse' => [
+                        'match' => true, 'reason' => 'MATCH_EVALUATION_REASON', 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z', 'segmentKeys' => ['foo', 'bar'], 'variantKey' => 'A', 'variantAttachment' => "{'data':'attachment'}"
+                    ]
+                ],
+                [
+                    "type" => "VARIANT_EVALUATION_RESPONSE_TYPE",
+                    'variantResponse' => [
+                        'match' => true, 'reason' => 'MATCH_EVALUATION_REASON', 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z', 'segmentKeys' => ['foo', 'bar'], 'variantKey' => 'A', 'variantAttachment' => "{'data':'attachment'}"
+                    ]
+                ],
+            ]
+        ]);
+
+        // execute the client function
+        $results = $this->apiClient->batch( [ 'flag1', 'flag2', 'flag3' ], [ 'local' => 'context' ], 'entity' );
+
+        // get payload on request to validate
+        $payload = $this->getLastPayload();
+
+        $this->assertEquals($payload, [
+            'requests' => [
+                [ 'flagKey' => 'flag1', 'namespaceKey' => 'namespace', 'context' => ['context' => 'demo', 'local' => 'context' ], 'entityId' => 'entity' ],
+                [ 'flagKey' => 'flag2', 'namespaceKey' => 'namespace', 'context' => ['context' => 'demo', 'local' => 'context' ], 'entityId' => 'entity' ],
+                [ 'flagKey' => 'flag3', 'namespaceKey' => 'namespace', 'context' => ['context' => 'demo', 'local' => 'context' ], 'entityId' => 'entity' ],
+            ]
+        ]);
+
+        $this->assertEquals(count( $results ), 3);
+        
+        // flag1 
+        $this->assertTrue($results[0]->getEnabled());
+        $this->assertEquals($results[0]->getReason(), 'MATCH_EVALUATION_REASON');
+        $this->assertEquals($results[0]->getRequestDurationMillis(), 0.39315);
+        $this->assertEquals($results[0]->getRequestId(), '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789');
+        $this->assertEquals($results[0]->getTimestamp(), '2023-10-31T00:57:47.263242143Z');
+
+        // flag 2
+        $this->assertTrue($results[1]->getMatch());
+        $this->assertEquals($results[1]->getReason(), 'MATCH_EVALUATION_REASON');
+        $this->assertEquals($results[1]->getRequestDurationMillis(), 0.39315);
+        $this->assertEquals($results[1]->getRequestId(), '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789');
+        $this->assertEquals($results[1]->getTimestamp(), '2023-10-31T00:57:47.263242143Z');
+        $this->assertEquals($results[1]->getSegmentKeys(), ['foo', 'bar']);
+        $this->assertEquals($results[1]->getVariantKey(), 'A');
+        $this->assertEquals($results[1]->getVariantAttachment(), "{'data':'attachment'}");
+
+        // flag 3
+        $this->assertTrue($results[2]->getMatch());
+        $this->assertEquals($results[2]->getReason(), 'MATCH_EVALUATION_REASON');
+        $this->assertEquals($results[2]->getRequestDurationMillis(), 0.39315);
+        $this->assertEquals($results[2]->getRequestId(), '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789');
+        $this->assertEquals($results[2]->getTimestamp(), '2023-10-31T00:57:47.263242143Z');
+        $this->assertEquals($results[2]->getSegmentKeys(), ['foo', 'bar']);
+        $this->assertEquals($results[2]->getVariantKey(), 'A');
+        $this->assertEquals($results[2]->getVariantAttachment(), "{'data':'attachment'}");
+    }
+
     protected function getLastPayload()
     {
         return json_decode($this->history[0]['request']->getBody()->getContents(), true);
