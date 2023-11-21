@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.0](https://github.com/flipt-io/flipt-php/compare/v0.0.1...v0.1.0) (2023-11-21)
+
+
+### Miscellaneous Chores
+
+* fix release please config ([cf9cc1a](https://github.com/flipt-io/flipt-php/commit/cf9cc1a51f086513191389c2033b9506e909e8ea))
+* release 0.1.0 ([0272338](https://github.com/flipt-io/flipt-php/commit/0272338c4731b8db82daad247e0b0cf89ebb2584))
+
 ## 0.0.1 (2023-10-31)
 
 
