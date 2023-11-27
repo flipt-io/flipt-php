@@ -7,7 +7,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Flipt\Client\FliptClient;
-
+use Flipt\Models\ResponseReasons;
 
 final class FliptClientTest extends TestCase
 {
@@ -37,7 +37,7 @@ final class FliptClientTest extends TestCase
     public function testContextMerge(): void
     {
 
-        $this->queueResponse(['enabled' => true, 'reason' => 'UNKNOWN_EVALUATION_REASON', 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z']);
+        $this->queueResponse(['enabled' => true, 'reason' => ResponseReasons::UNKNOWN_EVALUATION_REASON, 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z']);
 
         $client2 = $this->apiClient->withContext(['context1' => 'one', 'context2' => 'two']);
 
@@ -56,7 +56,7 @@ final class FliptClientTest extends TestCase
     public function testEntityId(): void
     {
 
-        $this->queueResponse(['enabled' => true, 'reason' => 'UNKNOWN_EVALUATION_REASON', 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z']);
+        $this->queueResponse(['enabled' => true, 'reason' => ResponseReasons::UNKNOWN_EVALUATION_REASON, 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z']);
 
         $result = $this->apiClient->boolean('flag', [], 'ENTITY');
 
@@ -72,7 +72,7 @@ final class FliptClientTest extends TestCase
 
     public function testBoolean(): void
     {
-        $this->queueResponse(['enabled' => true, 'reason' => 'MATCH_EVALUATION_REASON', 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z']);
+        $this->queueResponse(['enabled' => true, 'reason' => ResponseReasons::MATCH_EVALUATION_REASON, 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z']);
 
         // execute the client function
         $result = $this->apiClient->boolean('flag');
@@ -88,7 +88,7 @@ final class FliptClientTest extends TestCase
         ]);
 
         $this->assertTrue($result->getEnabled());
-        $this->assertEquals($result->getReason(), 'MATCH_EVALUATION_REASON');
+        $this->assertEquals($result->getReason(), ResponseReasons::MATCH_EVALUATION_REASON);
         $this->assertEquals($result->getRequestDurationMillis(), 0.39315);
         $this->assertEquals($result->getRequestId(), '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789');
         $this->assertEquals($result->getTimestamp(), '2023-10-31T00:57:47.263242143Z');
@@ -98,7 +98,7 @@ final class FliptClientTest extends TestCase
     public function testVariant(): void
     {
 
-        $this->queueResponse(['match' => true, 'reason' => 'MATCH_EVALUATION_REASON', 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z', 'segmentKeys' => ['foo', 'bar'], 'variantKey' => 'A', 'variantAttachment' => "{'data':'attachment'}"]);
+        $this->queueResponse(['match' => true, 'reason' => ResponseReasons::MATCH_EVALUATION_REASON, 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z', 'segmentKeys' => ['foo', 'bar'], 'variantKey' => 'A', 'variantAttachment' => "{'data':'attachment'}"]);
 
         // execute the client function
         $result = $this->apiClient->variant('flag');
@@ -114,7 +114,7 @@ final class FliptClientTest extends TestCase
         ]);
 
         $this->assertTrue($result->getMatch());
-        $this->assertEquals($result->getReason(), 'MATCH_EVALUATION_REASON');
+        $this->assertEquals($result->getReason(), ResponseReasons::MATCH_EVALUATION_REASON);
         $this->assertEquals($result->getRequestDurationMillis(), 0.39315);
         $this->assertEquals($result->getRequestId(), '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789');
         $this->assertEquals($result->getTimestamp(), '2023-10-31T00:57:47.263242143Z');
@@ -132,19 +132,19 @@ final class FliptClientTest extends TestCase
                 [
                     "type" => "BOOLEAN_EVALUATION_RESPONSE_TYPE",
                     'booleanResponse' => [
-                        'enabled' => true, 'reason' => 'MATCH_EVALUATION_REASON', 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z'
+                        'enabled' => true, 'reason' => ResponseReasons::MATCH_EVALUATION_REASON, 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z'
                     ]
                 ],
                 [
                     "type" => "VARIANT_EVALUATION_RESPONSE_TYPE",
                     'variantResponse' => [
-                        'match' => true, 'reason' => 'MATCH_EVALUATION_REASON', 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z', 'segmentKeys' => ['foo', 'bar'], 'variantKey' => 'A', 'variantAttachment' => "{'data':'attachment'}"
+                        'match' => true, 'reason' => ResponseReasons::MATCH_EVALUATION_REASON, 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z', 'segmentKeys' => ['foo', 'bar'], 'variantKey' => 'A', 'variantAttachment' => "{'data':'attachment'}"
                     ]
                 ],
                 [
                     "type" => "VARIANT_EVALUATION_RESPONSE_TYPE",
                     'variantResponse' => [
-                        'match' => true, 'reason' => 'MATCH_EVALUATION_REASON', 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z', 'segmentKeys' => ['foo', 'bar'], 'variantKey' => 'A', 'variantAttachment' => "{'data':'attachment'}"
+                        'match' => true, 'reason' => ResponseReasons::MATCH_EVALUATION_REASON, 'requestDurationMillis' => 123456, 'requestId' => '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789', 'requestDurationMillis' => 0.39315, 'timestamp' => '2023-10-31T00:57:47.263242143Z', 'segmentKeys' => ['foo', 'bar'], 'variantKey' => 'A', 'variantAttachment' => "{'data':'attachment'}"
                     ]
                 ],
             ]
@@ -168,14 +168,14 @@ final class FliptClientTest extends TestCase
         
         // flag1 
         $this->assertTrue($results[0]->getEnabled());
-        $this->assertEquals($results[0]->getReason(), 'MATCH_EVALUATION_REASON');
+        $this->assertEquals($results[0]->getReason(), ResponseReasons::MATCH_EVALUATION_REASON);
         $this->assertEquals($results[0]->getRequestDurationMillis(), 0.39315);
         $this->assertEquals($results[0]->getRequestId(), '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789');
         $this->assertEquals($results[0]->getTimestamp(), '2023-10-31T00:57:47.263242143Z');
 
         // flag 2
         $this->assertTrue($results[1]->getMatch());
-        $this->assertEquals($results[1]->getReason(), 'MATCH_EVALUATION_REASON');
+        $this->assertEquals($results[1]->getReason(), ResponseReasons::MATCH_EVALUATION_REASON);
         $this->assertEquals($results[1]->getRequestDurationMillis(), 0.39315);
         $this->assertEquals($results[1]->getRequestId(), '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789');
         $this->assertEquals($results[1]->getTimestamp(), '2023-10-31T00:57:47.263242143Z');
@@ -185,7 +185,7 @@ final class FliptClientTest extends TestCase
 
         // flag 3
         $this->assertTrue($results[2]->getMatch());
-        $this->assertEquals($results[2]->getReason(), 'MATCH_EVALUATION_REASON');
+        $this->assertEquals($results[2]->getReason(), ResponseReasons::MATCH_EVALUATION_REASON);
         $this->assertEquals($results[2]->getRequestDurationMillis(), 0.39315);
         $this->assertEquals($results[2]->getRequestId(), '621e48e2-9127-4309-b786-3bfa5885f4bc"23456789');
         $this->assertEquals($results[2]->getTimestamp(), '2023-10-31T00:57:47.263242143Z');
