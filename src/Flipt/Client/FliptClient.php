@@ -23,7 +23,7 @@ final class FliptClient
     /**
      * @param array<string, string> $context
      */
-    public function __construct(string|Client $host, string $namespace = "default", array $context = [], string $entityId = '', AuthenticationStrategy $authentication = null)
+    public function __construct(string|Client $host, string $namespace = "default", array $context = [], string $entityId = '', ?AuthenticationStrategy $authentication = null)
     {
         $this->authentication = $authentication;
         $this->namespace = $namespace;
